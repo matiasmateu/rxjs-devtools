@@ -6,7 +6,7 @@
   "license": "MIT",
   "main": "dist/index.js",
   "manifest": "dist/manifest.json",
-  "private": true,
+  "private": false,
   "scripts": {
     "build": "webpack --mode production",
     "watch": "webpack --watch --mode development",
