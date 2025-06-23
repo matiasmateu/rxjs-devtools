@@ -4,9 +4,10 @@ const CopyPlugin = require('copy-webpack-plugin');
 module.exports = {
   mode: 'production',
   entry: {
+    popup: './src/popup/popup.tsx',
+    devtools: './src/devtools.tsx',
     background: './src/background.ts',
     content: './src/content.ts',
-    popup: './src/popup/popup.tsx',
   },
   output: {
     path: path.resolve(__dirname, 'dist'),

@@ -1,0 +1,39 @@
+{
+  "name": "@reefmix/rxjs-devtools-react",
+  "version": "0.1.0",
+  "description": "React integration for RxJS DevTools, enabling connection with the rxjs-devtools-chrome-extension.",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc && vite build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src --ext .ts,.tsx"
+  },
+  "keywords": [
+    "react",
+    "rxjs",
+    "devtools",
+    "chrome-extension",
+    "redux-observable"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "react": ">=17.0.0",
+    "rxjs": ">=7.0.0"
+  },
+  "dependencies": {
+    "redux-observable": ">=2.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "typescript": "^5.0.0",
+    "vite": "^4.0.0",
+    "vitest": "^0.34.0",
+    "eslint": "^8.0.0"
+  }
+} 

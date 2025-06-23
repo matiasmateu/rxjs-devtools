@@ -4,8 +4,6 @@
   "author": "Matias Mateu",
   "description": "A Chrome extension for rxjs devtools",
   "license": "MIT",
-  "main": "dist/index.js",
-  "manifest": "dist/manifest.json",
   "scripts": {
     "build": "webpack --mode production",
     "watch": "webpack --watch --mode development",

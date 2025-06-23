@@ -1,27 +1,9 @@
 {
-  "name": "@reefmix/rxjs-devtools",
-  "version": "1.0.0",
-  "description": "rxjs dev-tools",
-  "main": "dist/index.js",
-  "scripts": {
-    "test": "test"
-  },
+  "name": "rxjs-devtools",
+  "private": true,
   "workspaces": [
-    "packages/*"
+    "packages/rxjs-devtools-chrome-extension",
+    "packages/rxjs-devtools-react"
   ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/matiasmateu/rxjs-devtools.git"
-  },
-  "keywords": [
-    "rxjs",
-    "devtools"
-  ],
-  "author": "Matias Mateu",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/matiasmateu/rxjs-devtools/issues"
-  },
-  "homepage": "https://github.com/matiasmateu/rxjs-devtools#readme",
-  "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610",
+  "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
 }
