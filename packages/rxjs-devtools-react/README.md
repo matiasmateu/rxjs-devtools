@@ -1,5 +1,9 @@
 # RxJS DevTools React Integration
 
+> **Project Status: Under Development**
+>
+> Note: This project is currently under active development. Only beta versions will be published for now. Features, APIs, and behaviors may change frequently until a stable release is announced.
+
 This package provides a React integration for [RxJS DevTools](../rxjs-devtools-chrome-extension), enabling seamless connection between your React app and the RxJS DevTools Chrome extension. It allows you to:
 
 - Display your app name in the devtools UI
