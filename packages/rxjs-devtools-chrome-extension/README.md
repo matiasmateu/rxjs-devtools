@@ -1,3 +1,7 @@
+# ⚠️ Project Status: Under Development
+
+> **Note:** This project is currently under active development. Only beta versions will be published for now. Features, APIs, and behaviors may change frequently until a stable release is announced.
+
 # RXJS DevTools - Chrome Extension Package
 
 This README provides an overview and instructions for working with the Chrome extension package located inside the monorepo. It is optimized for Cursor integration, offering clear metadata to help Cursor index and navigate the package.
