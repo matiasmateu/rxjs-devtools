@@ -7,7 +7,7 @@
   ],
   "packageManager": "yarn@4.9.2",
   "scripts": {
-    "version:beta": "yarn workspaces foreach --topological-dev --no-private version --prerelease --preid beta",
-    "publish:beta": "yarn workspaces foreach --topological-dev --no-private npm publish --tag beta --access public"
+    "version:beta": "yarn workspaces foreach --all version --prerelease --deferred --preid beta",
+    "publish:beta": "yarn workspaces foreach --all npm publish --tag beta --access public"
   }
 }
