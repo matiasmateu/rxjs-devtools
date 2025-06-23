@@ -7,7 +7,11 @@
   ],
   "packageManager": "yarn@4.9.2",
   "scripts": {
-    "version:beta": "yarn workspaces foreach --all version --prerelease --deferred --preid beta",
-    "publish:beta": "yarn workspaces foreach --all npm publish --tag beta --access public"
+    "changeset": "changeset",
+    "version:beta": "yarn changeset version",
+    "publish:beta": "yarn changeset publish --tag beta"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.26.2"
   }
 }

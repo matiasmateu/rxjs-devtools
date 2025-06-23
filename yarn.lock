@@ -1322,6 +1322,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"changesets@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "changesets@npm:1.0.2"
+  checksum: 10c0/fd72972b7ef59a2c8ba7a5fd0d483e9893921171358027203b9335ede5cb5541b68f2c42f4651f89b151c2936a909fe85b36ea79a3dad22b33e1e912b5aa5931
+  languageName: node
+  linkType: hard
+
 "check-error@npm:^1.0.3":
   version: 1.0.3
   resolution: "check-error@npm:1.0.3"
@@ -3250,6 +3257,8 @@ __metadata:
 "rxjs-devtools@workspace:.":
   version: 0.0.0-use.local
   resolution: "rxjs-devtools@workspace:."
+  dependencies:
+    changesets: "npm:^1.0.2"
   languageName: unknown
   linkType: soft
 
