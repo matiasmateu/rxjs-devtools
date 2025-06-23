@@ -1,6 +1,10 @@
 {
   "name": "@reefmix/rxjs-devtools-react",
   "version": "1.0.0-beta.2",
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "React integration for RxJS DevTools, enabling connection with the rxjs-devtools-chrome-extension.",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
