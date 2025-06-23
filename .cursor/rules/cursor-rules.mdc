@@ -1,0 +1,169 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+This is a proposal for a set of “cursor rules” (i.e. event‐capture rules plus cursor‐management semantics) you can use to instrument any RxJS observable and wire it up to a Redux-DevTools-style Chrome extension. It covers:
+
+1. **Global hook injection**
+2. **Event‐capture rules** (“cursor rules”)
+3. **Cursor/state‐history management**
+4. **Messaging protocol** between page and extension
+5. **Chrome extension side sketch**
+
+---
+
+## 1. Global Hook Injection
+
+At application startup (e.g. in your main bundle), inject a global hook onto `window`:
+
+```ts
+// devtools-hook.ts
+declare global {
+  interface Window {
+    __RXJS_DEVTOOLS_HOOK__?: RxDevToolsHook
+  }
+}
+
+export interface RxDevToolsHook {
+  connect(options: { name: string }): DevtoolsConnection
+}
+
+export interface DevtoolsConnection {
+  init(initialState: any): void
+  send(event: string, payload: any, cursor?: number): void
+}
+
+if (!window.__RXJS_DEVTOOLS_HOOK__) {
+  window.__RXJS_DEVTOOLS_HOOK__ = {
+    connect: createDevtoolsConnection
+  }
+}
+```
+
+All captured events will be routed through a `DevtoolsConnection` instance.
+
+---
+
+## 2. Event-Capture Rules (“Cursor Rules”)
+
+Instrument the core RxJS primitives so that every time an observable is created, subscribed to, emits, errors, completes, or is unsubscribed, we:
+
+1. **Assign a unique stream ID**
+2. **Capture payload + metadata**
+3. **Emit a DevTools message**
+
+| Rule            | Trigger                                                | Payload                                          |
+| --------------- | ------------------------------------------------------ | ------------------------------------------------ |
+| **CREATE**      | call to `new Observable(...)` or any operator’s `lift` | `{ streamId, operatorName, creationStack }`      |
+| **SUBSCRIBE**   | `.subscribe(...)`                                      | `{ streamId, subscriptionId, timestamp }`        |
+| **NEXT**        | observer’s `next(v)`                                   | `{ streamId, subscriptionId, value, timestamp }` |
+| **ERROR**       | observer’s `error(err)`                                | `{ streamId, subscriptionId, error, timestamp }` |
+| **COMPLETE**    | observer’s `complete()`                                | `{ streamId, subscriptionId, timestamp }`        |
+| **UNSUBSCRIBE** | subscription’s `unsubscribe()`                         | `{ streamId, subscriptionId, timestamp }`        |
+
+Each event is given a monotonically‐increasing **cursor** (a global sequence number).
+
+---
+
+## 3. Cursor / State‐History Management
+
+In Redux DevTools you have a “lifted state” where each action is an entry in a timeline. Here we:
+
+1. Maintain an in-page buffer:
+
+   ```ts
+   let cursor = 0
+   const history: Array<{ cursor: number, event: string, payload: any }> = []
+   ```
+2. On every capture, increment and assign:
+
+   ```ts
+   function record(event: string, payload: any) {
+     const entry = { cursor: ++cursor, event, payload }
+     history.push(entry)
+     connection.send(event, payload, cursor)
+   }
+   ```
+3. Expose methods to the extension:
+
+   * `JUMP_TO(cursor: number)`
+   * `RESET()`
+   * `PAUSE_RECORDING()` / `RESUME_RECORDING()`
+
+---
+
+## 4. Messaging Protocol
+
+Between page and extension you can use `window.postMessage` or a `chrome.runtime` port. For simplicity:
+
+```ts
+// on page
+connection.send = (event, payload, cursor) => {
+  window.postMessage({
+    source: 'rxjs-devtools',
+    type: event,
+    payload,
+    cursor
+  }, '*')
+}
+
+// in extension content script
+window.addEventListener('message', e => {
+  if (e.source !== window || e.data.source !== 'rxjs-devtools') return
+  port.postMessage(e.data)
+})
+```
+
+The extension’s background script relays to the DevTools panel.
+
+---
+
+## 5. Chrome Extension Side Sketch
+
+In your panel (e.g. React) you maintain a Redux store of:
+
+```ts
+interface StreamEvent {
+  cursor: number
+  event: string
+  payload: any
+}
+
+interface DevtoolsState {
+  events: StreamEvent[]
+  selectedCursor: number | null
+}
+```
+
+Reducers handle messages:
+
+```ts
+case 'NEXT':
+  return {
+    ...state,
+    events: [...state.events, action.payloadWithCursor]
+  }
+case 'JUMP_TO_CURSOR':
+  return {
+    ...state,
+    selectedCursor: action.cursor
+  }
+```
+
+You can then render:
+
+* A **timeline** list of events, clickable to jump (`dispatch({ type: 'JUMP_TO_CURSOR', cursor })`)
+* A **stream graph** showing values over time
+* **Inspector** pane showing payload details for the selected cursor
+
+---
+
+### Putting It All Together
+
+1. **Bundle your instrumentation** (`devtools-hook.ts` + patching RxJS) into a small UMD that apps import as early as possible.
+2. **Patch RxJS** by monkey-patching `Observable.prototype.lift` and wrapping `subscribe` so you invoke `record(...)` at each rule.
+3. **Connect to the extension** via the global hook.
+4. **In the extension**, consume the event stream, populate your lifted state, and present controls for time-travel, pausing, filtering by stream/operator, etc.
+
+With these “cursor rules” you’ll have full parity with Redux DevTools—including time-travel and event inspection—applied to arbitrary RxJS observables.
