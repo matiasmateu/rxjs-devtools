@@ -5,5 +5,9 @@
     "packages/rxjs-devtools-chrome-extension",
     "packages/rxjs-devtools-react"
   ],
-  "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
+  "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610",
+  "scripts": {
+    "version:beta": "yarn workspaces foreach --topological-dev --no-private version --prerelease --preid beta",
+    "publish:beta": "yarn workspaces foreach --topological-dev --no-private npm publish --tag beta --access public"
+  }
 }
