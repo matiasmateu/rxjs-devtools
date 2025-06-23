@@ -1,6 +1,6 @@
 {
   "name": "@reefmix/rxjs-devtools-chrome-extension",
-  "version": "1.0.0",
+  "version": "1.0.0-beta.1",
   "author": "Matias Mateu",
   "description": "A Chrome extension for rxjs devtools",
   "license": "MIT",
