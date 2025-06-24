@@ -18,7 +18,17 @@ Initialize the devtools integration in your React app as early as possible:
 ```js
 import { initializeRxjsDevtools } from 'rxjs-devtools-react';
 
+// Basic usage (with automatic detection)
 initializeRxjsDevtools({ appName: 'MyApp' });
+
+// Recommended: Use forced detection for modern bundlers (Vite, Webpack, etc.)
+initializeRxjsDevtools({ 
+  appName: 'MyApp',
+  forceDetection: {
+    rxjs: true,
+    reduxObservable: true
+  }
+});
 ```
 
 # rxjs devtools react connector
@@ -76,14 +86,41 @@ Install and open the companion Chrome extension. Your application will automatic
 ### initializeRxjsDevtools
 
 ```ts
-initializeRxjsDevtools(options: { appName: string }): void
+initializeRxjsDevtools(options: RxjsDevtoolsOptions): void
+
+interface RxjsDevtoolsOptions {
+  appName: string;
+  forceDetection?: {
+    rxjs?: boolean;
+    reduxObservable?: boolean;
+  };
+}
 ```
 
 - **appName**: The name of your app, shown in the devtools UI.
-- Automatically detects RxJS and redux-observable usage.
+- **forceDetection**: Optional object to force detection of libraries when automatic detection fails.
+- Automatically detects RxJS and redux-observable usage (or uses forced detection).
 - Injects the global hook for the Chrome extension.
 - Registers your app with the devtools.
 - Logs connection status to the console for debugging.
+
+### setRxjsDetectionFlags (Helper Function)
+
+```ts
+setRxjsDetectionFlags(flags: { rxjs?: boolean; reduxObservable?: boolean }): void
+```
+
+Manually set detection flags before calling `initializeRxjsDevtools`. Useful when automatic detection fails:
+
+```js
+import { setRxjsDetectionFlags, initializeRxjsDevtools } from 'rxjs-devtools-react';
+
+// Set detection flags manually
+setRxjsDetectionFlags({ rxjs: true, reduxObservable: true });
+
+// Then initialize normally
+initializeRxjsDevtools({ appName: 'MyApp' });
+```
 
 ## Displaying Connection Status (Optional)
 
