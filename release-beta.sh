@@ -32,7 +32,8 @@ print_error() {
 # Function to increment beta version
 increment_beta_version() {
     local package_json="$1"
-    local current_version=$(node -p "require('$package_json').version")
+    local absolute_path=$(realpath "$package_json")
+    local current_version=$(node -p "require('$absolute_path').version")
     
     # Extract version parts
     if [[ $current_version =~ ^([0-9]+\.[0-9]+\.[0-9]+)-beta\.([0-9]+)$ ]]; then
@@ -48,9 +49,9 @@ increment_beta_version() {
     # Update package.json
     node -e "
         const fs = require('fs');
-        const pkg = require('$package_json');
+        const pkg = require('$absolute_path');
         pkg.version = '$new_version';
-        fs.writeFileSync('$package_json', JSON.stringify(pkg, null, 2) + '\n');
+        fs.writeFileSync('$absolute_path', JSON.stringify(pkg, null, 2) + '\n');
     "
     
     echo "$new_version"
@@ -186,8 +187,9 @@ main() {
     for package_dir in packages/*/; do
         if [ -f "${package_dir}package.json" ]; then
             local package_json="${package_dir}package.json"
-            local package_name=$(node -p "require('$package_json').name")
-            local is_private=$(node -p "require('$package_json').private || false")
+            local absolute_path=$(realpath "$package_json")
+            local package_name=$(node -p "require('$absolute_path').name")
+            local is_private=$(node -p "require('$absolute_path').private || false")
             
             if [ "$is_private" = "false" ]; then
                 print_step "Updating version for $package_name"
