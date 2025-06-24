@@ -7,7 +7,7 @@
   },
   "description": "React integration for RxJS DevTools, enabling connection with the rxjs-devtools-chrome-extension.",
   "main": "dist/index.js",
-  "module": "dist/index.esm.js",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
