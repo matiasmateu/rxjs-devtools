@@ -5,7 +5,8 @@ module.exports = {
   mode: 'production',
   entry: {
     popup: './src/popup/popup.tsx',
-    devtools: './src/devtools.tsx',
+    devtools: './src/devtools.ts',
+    panel: './src/panel.tsx',
     background: './src/background.ts',
     content: './src/content.ts',
   },
@@ -32,6 +33,7 @@ module.exports = {
         { from: 'src/manifest.json', to: '.' },
         { from: 'src/popup/popup.html', to: '.' },
         { from: 'src/devtools.html', to: '.' },
+        { from: 'src/panel.html', to: '.' },
         { from: 'public/icons', to: 'icons' },
       ],
     }),

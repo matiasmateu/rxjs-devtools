@@ -1,0 +1,414 @@
+{
+  "packages/rxjs-devtools-chrome-extension": {
+    "root": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "name": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "tags": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "tags.npm:public": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.0": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.1": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.2": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.3": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.4": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.description": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageName": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageExports": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.isInPackageManagerWorkspaces": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.executor": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.options": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.metadata": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.options.script": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.metadata.scriptContent": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.metadata.runCommand": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.watch": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.watch.executor": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.watch.options": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.watch.metadata": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.watch.options.script": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.watch.metadata.scriptContent": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.watch.metadata.runCommand": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.executor": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.options": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.metadata": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.options.script": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.metadata.scriptContent": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.metadata.runCommand": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.executor": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.options": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.metadata": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.options.script": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.metadata.scriptContent": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.metadata.runCommand": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.package": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.package.executor": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.package.options": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.package.metadata": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.package.options.script": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.package.metadata.scriptContent": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.package.metadata.runCommand": [
+      "packages/rxjs-devtools-chrome-extension/package.json",
+      "nx/core/package-json"
+    ]
+  },
+  "packages/rxjs-devtools-react": {
+    "root": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "name": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "tags": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "tags.npm:public": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "tags.npm:react": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "tags.npm:rxjs": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "tags.npm:devtools": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "tags.npm:chrome-extension": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "tags.npm:redux-observable": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.0": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.1": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.2": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.targetGroups.NPM Scripts.3": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.description": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageName": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageExports": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.packageMain": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "metadata.js.isInPackageManagerWorkspaces": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.executor": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.options": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.metadata": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.options.script": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.metadata.scriptContent": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.build.metadata.runCommand": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.executor": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.options": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.metadata": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.options.script": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.metadata.scriptContent": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test.metadata.runCommand": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.executor": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.options": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.metadata": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.options.script": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.metadata.scriptContent": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.test:watch.metadata.runCommand": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.executor": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.options": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.metadata": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.options.script": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.metadata.scriptContent": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ],
+    "targets.lint.metadata.runCommand": [
+      "packages/rxjs-devtools-react/package.json",
+      "nx/core/package-json"
+    ]
+  }
+}
