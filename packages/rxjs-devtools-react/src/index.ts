@@ -770,17 +770,43 @@ export function registerStream(name: string, observable: any, options?: { operat
     return doRegisterStream(name, observable, options);
   }
 
-  // Otherwise, queue the registration and return a promise that resolves to the wrapped observable
+  // Otherwise, create a proxy that behaves like the original observable
+  // but queues the DevTools registration for later
   console.info(`[RxJS DevTools] Queueing stream registration for "${name}" - DevTools not yet initialized`);
   
-  return new Promise<any>((resolve) => {
-    window.__RXJS_DEVTOOLS_QUEUE__!.push({
-      name,
-      observable,
-      options,
-      resolve
-    });
+  let wrappedObservable: any = null;
+
+  // Create a proxy that forwards all calls to the original observable
+  // while queueing the DevTools registration
+  const proxyObservable = new Proxy(observable, {
+    get(target, prop) {
+      // If DevTools becomes available and we haven't wrapped yet, do it now
+      if (!wrappedObservable && window.__RXJS_DEVTOOLS_INITIALIZED__ && window.__RXJS_STREAMS_TRACKER__) {
+        wrappedObservable = doRegisterStream(name, observable, options);
+        return wrappedObservable[prop];
+      }
+      
+      // Return the wrapped observable property if available
+      if (wrappedObservable) {
+        return wrappedObservable[prop];
+      }
+      
+      // Otherwise, return the original observable property
+      return target[prop];
+    }
   });
+
+  // Queue the registration to happen when DevTools initializes
+  window.__RXJS_DEVTOOLS_QUEUE__!.push({
+    name,
+    observable,
+    options,
+    resolve: (wrapped: any) => {
+      wrappedObservable = wrapped;
+    }
+  });
+
+  return proxyObservable;
 }
 
 // Convenience function for common RxJS creation patterns
