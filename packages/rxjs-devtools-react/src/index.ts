@@ -35,12 +35,21 @@ interface RxjsDevtoolsHook {
   updateStreams?(appName: string, streams: StreamInfo[]): void;
 }
 
+interface QueuedStreamRegistration {
+  name: string;
+  observable: any;
+  options?: { operator?: string };
+  resolve: (value: any) => void;
+}
+
 declare global {
   interface Window {
     __RXJS_DEVTOOLS_HOOK__?: RxjsDevtoolsHook;
     __REDUX_OBSERVABLE_PRESENT__?: boolean;
     __RXJS_ORIGINAL_OBSERVABLE__?: any;
     __RXJS_STREAMS_TRACKER__?: StreamTracker;
+    __RXJS_DEVTOOLS_QUEUE__?: QueuedStreamRegistration[];
+    __RXJS_DEVTOOLS_INITIALIZED__?: boolean;
   }
 }
 
@@ -531,6 +540,42 @@ function detectReduxObservableWithQueue(callback: (detected: boolean) => void) {
  * Helper function to manually indicate that RxJS and/or redux-observable are present
  * Call this before initializeRxjsDevtools if automatic detection fails
  */
+// Initialize the queue if it doesn't exist
+function initializeQueue(): void {
+  if (!window.__RXJS_DEVTOOLS_QUEUE__) {
+    window.__RXJS_DEVTOOLS_QUEUE__ = [];
+  }
+  if (window.__RXJS_DEVTOOLS_INITIALIZED__ === undefined) {
+    window.__RXJS_DEVTOOLS_INITIALIZED__ = false;
+  }
+}
+
+// Process all queued stream registrations
+function processQueue(): void {
+  if (!window.__RXJS_DEVTOOLS_QUEUE__ || !window.__RXJS_STREAMS_TRACKER__) {
+    return;
+  }
+
+  console.info(`[RxJS DevTools] Processing ${window.__RXJS_DEVTOOLS_QUEUE__.length} queued stream registrations`);
+  
+  const queue = window.__RXJS_DEVTOOLS_QUEUE__.slice(); // Copy the queue
+  window.__RXJS_DEVTOOLS_QUEUE__ = []; // Clear the original queue
+
+  for (const queuedItem of queue) {
+    try {
+      const wrappedObservable = doRegisterStream(queuedItem.name, queuedItem.observable, queuedItem.options);
+      queuedItem.resolve(wrappedObservable);
+    } catch (error) {
+      console.warn('[RxJS DevTools] Error processing queued stream:', error);
+      queuedItem.resolve(queuedItem.observable); // Return original observable on error
+    }
+  }
+}
+
+/**
+ * Helper function to manually indicate that RxJS and/or redux-observable are present
+ * Call this before initializeRxjsDevtools if automatic detection fails
+ */
 export function setRxjsDetectionFlags(flags: { rxjs?: boolean; reduxObservable?: boolean }) {
   if (flags.rxjs) {
     (window as any).__RX_JS_PRESENT__ = true;
@@ -544,6 +589,9 @@ export function initializeRxjsDevtools(options: RxjsDevtoolsOptions): void {
   if (!options?.appName) {
     throw new Error('App name is required for RxJS DevTools initialization.');
   }
+
+  // Initialize the queue first
+  initializeQueue();
 
   // Create stream tracker
   const streamTracker = new StreamTracker(options.appName);
@@ -567,6 +615,12 @@ export function initializeRxjsDevtools(options: RxjsDevtoolsOptions): void {
 
   // Start tracking streams immediately
   patchObservable(streamTracker);
+
+  // Mark as initialized
+  window.__RXJS_DEVTOOLS_INITIALIZED__ = true;
+
+  // Process any queued stream registrations
+  processQueue();
 
   // Use forced detection if provided
   if (options.forceDetection) {
@@ -615,12 +669,11 @@ export function initializeRxjsDevtools(options: RxjsDevtoolsOptions): void {
   });
 }
 
-// Add manual stream registration API
-export function registerStream(name: string, observable: any, options?: { operator?: string }): any {
+// Internal function that does the actual stream registration
+function doRegisterStream(name: string, observable: any, options?: { operator?: string }): any {
   const tracker = window.__RXJS_STREAMS_TRACKER__;
   if (!tracker) {
-    console.warn('[RxJS DevTools] Stream tracker not initialized. Call initializeRxjsDevtools first.');
-    return observable;
+    throw new Error('[RxJS DevTools] Stream tracker not available during registration.');
   }
 
   const streamId = tracker.generateStreamId();
@@ -692,7 +745,7 @@ export function registerStream(name: string, observable: any, options?: { operat
           const result = target.pipe.apply(target, operators);
           // Register the piped observable as a new stream
           const operatorNames = operators.map((op: any) => op.constructor?.name || 'operator').join(' → ');
-          return registerStream(`${name}_piped`, result, { operator: operatorNames });
+          return doRegisterStream(`${name}_piped`, result, { operator: operatorNames });
         };
       }
       
@@ -705,6 +758,29 @@ export function registerStream(name: string, observable: any, options?: { operat
   (wrappedObservable as any).__rxjs_devtools_name__ = name;
   
   return wrappedObservable;
+}
+
+// Public API that handles queueing when DevTools is not yet initialized
+export function registerStream(name: string, observable: any, options?: { operator?: string }): any {
+  // Initialize queue if not done yet
+  initializeQueue();
+
+  // If DevTools is initialized, register immediately
+  if (window.__RXJS_DEVTOOLS_INITIALIZED__ && window.__RXJS_STREAMS_TRACKER__) {
+    return doRegisterStream(name, observable, options);
+  }
+
+  // Otherwise, queue the registration and return a promise that resolves to the wrapped observable
+  console.info(`[RxJS DevTools] Queueing stream registration for "${name}" - DevTools not yet initialized`);
+  
+  return new Promise<any>((resolve) => {
+    window.__RXJS_DEVTOOLS_QUEUE__!.push({
+      name,
+      observable,
+      options,
+      resolve
+    });
+  });
 }
 
 // Convenience function for common RxJS creation patterns
