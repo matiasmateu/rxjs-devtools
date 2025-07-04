@@ -9,7 +9,9 @@
   "scripts": {
     "changeset": "changeset",
     "version:beta": "yarn changeset version",
-    "publish:beta": "yarn changeset publish --tag beta"
+    "publish:beta": "yarn changeset publish --tag beta",
+    "release:beta": "./release-beta.sh",
+    "build:all": "yarn workspace @reefmix/rxjs-devtools-react build && yarn workspace @reefmix/rxjs-devtools-chrome-extension build"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.2"
