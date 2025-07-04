@@ -170,176 +170,262 @@ function patchObservable(tracker: StreamTracker): void {
     return;
   }
 
-  try {
-    // Try to get Observable from various locations
-    let Observable: any = null;
-    
-    if (typeof require !== 'undefined') {
-      try {
-        Observable = require('rxjs').Observable;
-      } catch {}
-    }
-    
-    if (!Observable && (window as any).rxjs) {
-      Observable = (window as any).rxjs.Observable;
-    }
-    
-    if (!Observable && typeof (window as any).Observable !== 'undefined') {
-      Observable = (window as any).Observable;
-    }
+  // Strategy 1: Try to find Observable through module detection
+  const tryPatchObservable = () => {
+    try {
+      // Look for Observable in various locations
+      let Observable: any = null;
 
-    if (!Observable) {
-      // Try dynamic import
-      if (typeof (window as any).import !== 'undefined') {
-        (window as any).import('rxjs').then((rxjs: any) => {
+      // Try to find Observable through require (CommonJS)
+      if (typeof require !== 'undefined') {
+        try {
+          const rxjs = require('rxjs');
           Observable = rxjs.Observable;
-          if (Observable) {
-            performPatch(Observable, tracker);
-          }
-        }).catch(() => {});
+          console.log('[RxJS DevTools] Found Observable via require');
+        } catch {}
       }
-      return;
-    }
 
-    performPatch(Observable, tracker);
-  } catch (error) {
-    console.warn('[RxJS DevTools] Failed to patch Observable:', error);
+      // Try global rxjs object
+      if (!Observable && (window as any).rxjs?.Observable) {
+        Observable = (window as any).rxjs.Observable;
+        console.log('[RxJS DevTools] Found Observable via global rxjs');
+      }
+
+      // Try window.Observable
+      if (!Observable && (window as any).Observable) {
+        Observable = (window as any).Observable;
+        console.log('[RxJS DevTools] Found Observable via window.Observable');
+      }
+
+      // Strategy 2: Monkey patch by intercepting prototype methods
+      // This works even when Observable is imported as ES modules
+      if (!Observable) {
+        // Try to detect when Observable instances are created by checking for prototype methods
+        const originalPrototypeMethods = {
+          subscribe: undefined as any,
+          pipe: undefined as any,
+          lift: undefined as any
+        };
+
+        // Set up a global hook to catch Observable instances
+        const observableDetectionInterval = setInterval(() => {
+          // Look for any object that has Observable-like methods
+          try {
+            // Check if any element has rxjs properties (webpack/bundler might expose them)
+            const scripts = Array.from(document.querySelectorAll('script'));
+            for (const script of scripts) {
+              if (script.src && script.src.includes('rxjs')) {
+                console.log('[RxJS DevTools] Detected RxJS script:', script.src);
+              }
+            }
+
+            // Try to patch through DOM inspection
+            if ((window as any).__webpack_require__) {
+              console.log('[RxJS DevTools] Webpack detected, trying module resolution');
+              // Webpack detected - try to find rxjs module
+            }
+          } catch (error) {
+            // Silent fail
+          }
+        }, 100);
+
+        // Stop detection after 5 seconds
+        setTimeout(() => {
+          clearInterval(observableDetectionInterval);
+          if (!window.__RXJS_ORIGINAL_OBSERVABLE__) {
+            console.warn('[RxJS DevTools] Could not find Observable constructor to patch. Stream tracking will not work.');
+            console.warn('[RxJS DevTools] Make sure initializeRxjsDevtools is called after RxJS is loaded.');
+          }
+        }, 5000);
+
+        return false;
+      }
+
+      if (Observable) {
+        performPatch(Observable, tracker);
+        return true;
+      }
+    } catch (error) {
+      console.warn('[RxJS DevTools] Error during Observable detection:', error);
+    }
+    return false;
+  };
+
+  // Try immediately
+  if (tryPatchObservable()) {
+    return;
   }
+
+  // If immediate patching failed, try again after a delay
+  setTimeout(() => {
+    if (!window.__RXJS_ORIGINAL_OBSERVABLE__) {
+      tryPatchObservable();
+    }
+  }, 100);
+
+  // Final attempt after all modules should be loaded
+  setTimeout(() => {
+    if (!window.__RXJS_ORIGINAL_OBSERVABLE__) {
+      console.warn('[RxJS DevTools] Final attempt to patch Observable...');
+      tryPatchObservable();
+    }
+  }, 1000);
 }
 
 function performPatch(Observable: any, tracker: StreamTracker): void {
   // Store original
   window.__RXJS_ORIGINAL_OBSERVABLE__ = Observable;
+  console.log('[RxJS DevTools] Starting Observable patching...');
 
-  // Patch Observable constructor
-  const originalObservable = Observable;
-  const originalCreate = Observable.create;
-  const originalLift = Observable.prototype.lift;
+  try {
+    // Store original methods
+    const originalCreate = Observable.create;
+    const originalLift = Observable.prototype.lift;
+    const originalSubscribe = Observable.prototype.subscribe;
 
-  // Patch Observable.create if it exists
-  if (originalCreate) {
-    Observable.create = function(subscribe: any) {
-      const streamId = tracker.generateStreamId();
-      const stack = tracker.captureStack();
-      tracker.registerStream(streamId, 'Observable.create', stack);
-      
-      const originalObservable = originalCreate.call(this, subscribe);
-      (originalObservable as any).__rxjs_devtools_id__ = streamId;
-      return originalObservable;
-    };
-  }
-
-  // Patch Observable constructor
-  function PatchedObservable(this: any, subscribe?: any) {
-    const streamId = tracker.generateStreamId();
-    const stack = tracker.captureStack();
-    tracker.registerStream(streamId, 'new Observable', stack);
-    
-    const instance = originalObservable.call(this, subscribe) || this;
-    (instance as any).__rxjs_devtools_id__ = streamId;
-    return instance;
-  }
-
-  // Copy prototype and static methods
-  PatchedObservable.prototype = Observable.prototype;
-  Object.setPrototypeOf(PatchedObservable, Observable);
-  Object.getOwnPropertyNames(Observable).forEach(key => {
-    if (key !== 'prototype' && key !== 'name' && key !== 'length') {
-      try {
-        (PatchedObservable as any)[key] = (Observable as any)[key];
-      } catch {}
+    // Patch Observable.create if it exists
+    if (originalCreate) {
+      Observable.create = function(subscribe: any) {
+        const streamId = tracker.generateStreamId();
+        const stack = tracker.captureStack();
+        tracker.registerStream(streamId, 'Observable.create', stack);
+        
+        const observable = originalCreate.call(this, subscribe);
+        (observable as any).__rxjs_devtools_id__ = streamId;
+        return observable;
+      };
+      console.log('[RxJS DevTools] Patched Observable.create');
     }
-  });
 
-  // Patch lift method (used by operators)
-  if (originalLift) {
-    Observable.prototype.lift = function(operator: any) {
+    // Patch constructor by wrapping it
+    const OriginalObservable = Observable;
+    const PatchedObservable = function(this: any, subscribe?: any) {
       const streamId = tracker.generateStreamId();
       const stack = tracker.captureStack();
-      const operatorName = operator?.constructor?.name || 'unknown';
-      tracker.registerStream(streamId, operatorName, stack);
+      tracker.registerStream(streamId, 'new Observable', stack);
       
-      const result = originalLift.call(this, operator);
-      (result as any).__rxjs_devtools_id__ = streamId;
+      const result = OriginalObservable.call(this, subscribe);
+      if (result) {
+        (result as any).__rxjs_devtools_id__ = streamId;
+      }
+      (this as any).__rxjs_devtools_id__ = streamId;
       return result;
     };
-  }
 
-  // Patch subscribe method
-  const originalSubscribe = Observable.prototype.subscribe;
-  Observable.prototype.subscribe = function(...args: any[]) {
-    const streamId = (this as any).__rxjs_devtools_id__;
-    if (streamId) {
-      tracker.subscribeToStream(streamId);
-    }
-
-    // Wrap observer functions to track emissions
-    const observer = args[0];
-    if (observer && typeof observer === 'object') {
-      const originalNext = observer.next;
-      const originalError = observer.error;
-      const originalComplete = observer.complete;
-
-      if (originalNext) {
-        observer.next = function(value: any) {
-          if (streamId) {
-            tracker.emitValue(streamId, value);
-          }
-          return originalNext.call(this, value);
-        };
+    // Copy prototype and static methods
+    PatchedObservable.prototype = Observable.prototype;
+    Object.setPrototypeOf(PatchedObservable, Observable);
+    Object.getOwnPropertyNames(Observable).forEach(key => {
+      if (key !== 'prototype' && key !== 'name' && key !== 'length') {
+        try {
+          (PatchedObservable as any)[key] = (Observable as any)[key];
+        } catch {}
       }
+    });
 
-      if (originalError) {
-        observer.error = function(error: any) {
-          if (streamId) {
-            tracker.errorStream(streamId);
-          }
-          return originalError.call(this, error);
-        };
-      }
-
-      if (originalComplete) {
-        observer.complete = function() {
-          if (streamId) {
-            tracker.completeStream(streamId);
-          }
-          return originalComplete.call(this);
-        };
-      }
-    } else if (typeof observer === 'function') {
-      // Handle function-based observer
-      args[0] = function(value: any) {
-        if (streamId) {
-          tracker.emitValue(streamId, value);
+    // Patch lift method (used by operators)
+    if (originalLift) {
+      Observable.prototype.lift = function(this: any, operator: any) {
+        const parentId = (this as any).__rxjs_devtools_id__;
+        const streamId = tracker.generateStreamId();
+        const stack = tracker.captureStack();
+        const operatorName = operator?.constructor?.name || 'unknown operator';
+        
+        tracker.registerStream(streamId, operatorName, stack);
+        
+        const result = originalLift.call(this, operator);
+        (result as any).__rxjs_devtools_id__ = streamId;
+        
+        // Link parent-child relationship if possible
+        if (parentId) {
+          (result as any).__rxjs_devtools_parent_id__ = parentId;
         }
-        return observer(value);
+        
+        return result;
       };
+      console.log('[RxJS DevTools] Patched Observable.prototype.lift');
     }
 
-    const subscription = originalSubscribe.apply(this, args);
-    
-    // Patch unsubscribe
-    const originalUnsubscribe = subscription.unsubscribe;
-    subscription.unsubscribe = function() {
-      if (streamId) {
-        tracker.unsubscribeFromStream(streamId);
+    // Patch subscribe method
+    if (originalSubscribe) {
+      Observable.prototype.subscribe = function(this: any, ...args: any[]) {
+        const streamId = (this as any).__rxjs_devtools_id__;
+        
+        if (streamId) {
+          tracker.subscribeToStream(streamId);
+          
+          // Wrap observer functions to track emissions
+          if (args.length > 0) {
+            const observer = args[0];
+            
+            if (observer && typeof observer === 'object') {
+              // Object observer
+              if (observer.next && typeof observer.next === 'function') {
+                const originalNext = observer.next;
+                observer.next = function(value: any) {
+                  tracker.emitValue(streamId, value);
+                  return originalNext.call(this, value);
+                };
+              }
+              
+              if (observer.error && typeof observer.error === 'function') {
+                const originalError = observer.error;
+                observer.error = function(error: any) {
+                  tracker.errorStream(streamId);
+                  return originalError.call(this, error);
+                };
+              }
+              
+              if (observer.complete && typeof observer.complete === 'function') {
+                const originalComplete = observer.complete;
+                observer.complete = function() {
+                  tracker.completeStream(streamId);
+                  return originalComplete.call(this);
+                };
+              }
+            } else if (typeof observer === 'function') {
+              // Function observer
+              args[0] = function(value: any) {
+                tracker.emitValue(streamId, value);
+                return observer(value);
+              };
+            }
+          }
+        }
+
+        const subscription = originalSubscribe.apply(this, args);
+        
+        // Patch unsubscribe
+        if (subscription && subscription.unsubscribe) {
+          const originalUnsubscribe = subscription.unsubscribe;
+          subscription.unsubscribe = function() {
+            if (streamId) {
+              tracker.unsubscribeFromStream(streamId);
+            }
+            return originalUnsubscribe.call(this);
+          };
+        }
+
+        return subscription;
+      };
+      console.log('[RxJS DevTools] Patched Observable.prototype.subscribe');
+    }
+
+    // Try to replace global references
+    try {
+      if ((window as any).Observable === Observable) {
+        (window as any).Observable = PatchedObservable;
       }
-      return originalUnsubscribe.call(this);
-    };
-
-    return subscription;
-  };
-
-  // Replace global Observable if it exists
-  try {
-    if ((window as any).Observable) {
-      (window as any).Observable = PatchedObservable;
+      if ((window as any).rxjs?.Observable === Observable) {
+        (window as any).rxjs.Observable = PatchedObservable;
+      }
+    } catch (error) {
+      console.warn('[RxJS DevTools] Could not replace global Observable references:', error);
     }
-    if ((window as any).rxjs) {
-      (window as any).rxjs.Observable = PatchedObservable;
-    }
+
+    console.log('[RxJS DevTools] Observable patching completed successfully');
   } catch (error) {
-    console.warn('[RxJS DevTools] Failed to replace global Observable:', error);
+    console.error('[RxJS DevTools] Error during Observable patching:', error);
   }
 }
 
@@ -527,4 +613,106 @@ export function initializeRxjsDevtools(options: RxjsDevtoolsOptions): void {
       );
     });
   });
+}
+
+// Add manual stream registration API
+export function registerStream(name: string, observable: any, options?: { operator?: string }): any {
+  const tracker = window.__RXJS_STREAMS_TRACKER__;
+  if (!tracker) {
+    console.warn('[RxJS DevTools] Stream tracker not initialized. Call initializeRxjsDevtools first.');
+    return observable;
+  }
+
+  const streamId = tracker.generateStreamId();
+  const stack = tracker.captureStack();
+  const operator = options?.operator || 'manual';
+  
+  tracker.registerStream(streamId, operator, stack);
+  
+  // Create a wrapper that tracks the stream
+  const wrappedObservable = new Proxy(observable, {
+    get(target, prop) {
+      if (prop === 'subscribe') {
+        return function(...args: any[]) {
+          tracker.subscribeToStream(streamId);
+          
+          // Wrap observer to track emissions
+          if (args.length > 0) {
+            const observer = args[0];
+            
+            if (observer && typeof observer === 'object') {
+              if (observer.next) {
+                const originalNext = observer.next;
+                observer.next = function(value: any) {
+                  tracker.emitValue(streamId, value);
+                  return originalNext.call(this, value);
+                };
+              }
+              
+              if (observer.error) {
+                const originalError = observer.error;
+                observer.error = function(error: any) {
+                  tracker.errorStream(streamId);
+                  return originalError.call(this, error);
+                };
+              }
+              
+              if (observer.complete) {
+                const originalComplete = observer.complete;
+                observer.complete = function() {
+                  tracker.completeStream(streamId);
+                  return originalComplete.call(this);
+                };
+              }
+            } else if (typeof observer === 'function') {
+              args[0] = function(value: any) {
+                tracker.emitValue(streamId, value);
+                return observer(value);
+              };
+            }
+          }
+          
+          const subscription = target.subscribe.apply(target, args);
+          
+          // Wrap unsubscribe
+          if (subscription && subscription.unsubscribe) {
+            const originalUnsubscribe = subscription.unsubscribe;
+            subscription.unsubscribe = function() {
+              tracker.unsubscribeFromStream(streamId);
+              return originalUnsubscribe.call(this);
+            };
+          }
+          
+          return subscription;
+        };
+      }
+      
+      if (prop === 'pipe') {
+        return function(...operators: any[]) {
+          const result = target.pipe.apply(target, operators);
+          // Register the piped observable as a new stream
+          const operatorNames = operators.map((op: any) => op.constructor?.name || 'operator').join(' → ');
+          return registerStream(`${name}_piped`, result, { operator: operatorNames });
+        };
+      }
+      
+      return target[prop];
+    }
+  });
+  
+  // Store the stream ID on the wrapper
+  (wrappedObservable as any).__rxjs_devtools_id__ = streamId;
+  (wrappedObservable as any).__rxjs_devtools_name__ = name;
+  
+  return wrappedObservable;
+}
+
+// Convenience function for common RxJS creation patterns
+export function trackObservable<T>(name: string, observable: any): any {
+  return registerStream(name, observable, { operator: 'tracked' });
+}
+
+// Helper for Subject tracking
+export function trackSubject<T>(name: string, subject: any): any {
+  return registerStream(name, subject, { operator: 'Subject' });
 }
