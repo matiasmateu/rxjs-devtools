@@ -34,6 +34,7 @@ module.exports = {
         { from: 'src/popup/popup.html', to: '.' },
         { from: 'src/devtools.html', to: '.' },
         { from: 'src/panel.html', to: '.' },
+        { from: 'src/bridge.js', to: '.' },
         { from: 'public/icons', to: 'icons' },
       ],
     }),
